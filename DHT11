@@ -1,0 +1,117 @@
+#include "BluetoothSerial.h"
+
+#include <DHT.h>
+
+
+int ledPin = 16;                // choose the pin for the LED
+int inputPin = 17;               // choose the input pin (for IR sensor)
+int pirState = LOW;             // we start, assuming no motion detected
+int val = 0;                    // variable for reading the pin status
+
+
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+#if !defined(CONFIG_BT_SPP_ENABLED)
+#error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
+#endif
+
+BluetoothSerial SerialBT;
+
+
+int i=0;
+
+DHT dht(15,DHT11);
+
+void setup() {
+
+dht.begin();
+  delay(2000);
+
+pinMode(15,INPUT);
+
+pinMode(ledPin, OUTPUT);      // declare LED as output
+  pinMode(inputPin, INPUT);     // declare sensor as input
+
+
+
+ 
+  Serial.begin(115200);
+  SerialBT.begin("ESP32vv"); //Bluetooth device name
+  Serial.println("The device started, now you can pair it with bluetooth!");
+
+
+
+  SerialBT.write(Serial.read());
+}
+
+void loop() {
+
+float t=dht.readTemperature();
+float h=dht.readHumidity();
+Serial.print("Temp: ");
+Serial.print(t);
+Serial.print("°C");
+
+delay(100);
+Serial.print(" Humidity: ");
+Serial.print(h);
+Serial.println("°F");
+//Serial.print(temp);
+
+ if (Serial.available()) {
+    SerialBT.write(Serial.read());
+  }
+  if (SerialBT.available()) {
+    Serial.write(i=SerialBT.read());
+    if(i=='1')
+    {
+
+
+//SerialBT.print(“Humidity: “);
+SerialBT.print("Humidity:");
+SerialBT.print(h);
+//SerialBT.println(“%”);
+//SerialBT.print(“Temp: “);
+
+SerialBT.print(" ,Temp:");
+SerialBT.print(t);
+//SerialBT.println(“ C”);
+delay(1000);
+      }
+     
+  }
+  delay(20);
+
+
+
+
+
+
+ 
+  if (Serial.available()) {
+    SerialBT.write(Serial.read());
+  }
+  if (SerialBT.available()) {
+    Serial.write(SerialBT.read());
+  }
+  delay(20);
+
+//dht
+
+//float temp=dht.readTemperature();
+//float Humidity=dht.readHumidity();
+
+//Serial.print("Tempearture: ");
+//Serial.print(temp);
+//Serial.print("°C");
+
+//Serial.print("Humidity: ");
+//Serial.print(Humidity);
+//Serial.println("%");
+
+delay(2000);
+
+}
