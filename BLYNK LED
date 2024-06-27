@@ -1,0 +1,43 @@
+#define BLYNK_TEMPLATE_ID "TMPL3KL0zkwd8"
+#define BLYNK_TEMPLATE_NAME "LED"
+#define BLYNK_AUTH_TOKEN "RHoLvhNZ4zFYbJ__igs5wCfR52SzF3tA"
+
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "";
+char pass[] = "5";
+
+
+BlynkTimer timer;
+
+BLYNK_WRITE(V0)
+{
+  int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
+  digitalWrite(4,pinValue);
+  Serial.println(pinValue);
+}
+
+
+void setup()
+{
+  // Debug console
+  Serial.begin(9600);
+
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+
+  //timer.setInterval(1000L, sendSensor);
+
+  pinMode(4,OUTPUT);
+}
+
+void loop()
+{
+  Blynk.run();
+
+  timer.run();
+}
